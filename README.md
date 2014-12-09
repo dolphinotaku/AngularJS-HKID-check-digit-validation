@@ -11,11 +11,7 @@ Usage
 - Paste the HKID to the textarea
 - The validation result will come out
 
-##Requirement
-- angularJS (must)
-- bootstrap (optional)
-
-##Function
+##Features
 - Handle a list of HKID(s)
 - HKID length and format validation
   - cater for one/two character prefix case
@@ -26,6 +22,10 @@ Usage
 	- display result as a table view with success or warning background color
 	- display the check digit formual details of each HKID in the table view
 	- provide a search function, quickly focus on valid/invalid case
+
+##Requirement
+- angularJS (must)
+- bootstrap (optional)
 
 ##Download
 Download [ZIP](https://github.com/keithbox/AngularJS-HKID-check-digit-validation/archive/master.zip) from GitHub
