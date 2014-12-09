@@ -1,9 +1,8 @@
 #AngularJS HKID check digit validation
-=====================================
 
 `hkid-check.html` *page*
 
-This is a little tool use to validate a set of HKIDs. For you to use in your projects. Greate for share and release under [MIT License](https://github.com/keithbox/AngularJS-HKID-check-digit-validation/tree/master#license)
+This is a little tool use to validate a set of HKIDs. For you to use in your projects. Greate for share and release under MIT License
 
 ##Demo
 Let try on the [demo page](http://keithbox.github.io/AngularJS-HKID-check-digit-validation/hkid-check.html)
@@ -30,11 +29,10 @@ Usage
 
 ##Download
 Download [ZIP](https://github.com/keithbox/AngularJS-HKID-check-digit-validation/archive/master.zip) from GitHub
+## License
+`hkid-check.html` is licensed under the MIT license. [View license file](https://github.com/keithbox/AngularJS-HKID-check-digit-validation/blob/master/license)
 	
 ##Contributing
 Please do not hesitate to perform your PULL requests when you found out some `bugs` or `problems`. I apologise in advance for the invalid message hard code in somewhere. For any ideas who would like to improve this little validation also are welcome. I will follow the action on pull requests and issues as soon as I can.
-
-## License
-`hkid-check.html` is licensed under the MIT license. [View license file](https://github.com/keithbox/AngularJS-HKID-check-digit-validation/blob/master/license)
 
 <!-- ##Support and Donate -->
