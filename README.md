@@ -2,7 +2,8 @@
 
 `hkid-check.html` *page*
 
-This is a little tool use to validate a set of HKIDs. For you to use in your projects. Greate for share and release under MIT License
+This is a little tool use to validate a set of HKIDs. Also for me to get more understand in AngularJS, have fun.
+I need to perform data migration during my work, to prevent the typing mistakes and human errors. The tool uses a well known unofficial algorithm to perform Check Digit on HKID. Until this moment, the check digit algorithm, it seems to be correct, even the government never recognizes that.
 
 ## Demo
 Let try on the [demo page](http://keithbox.github.io/AngularJS-HKID-check-digit-validation/hkid-check.html)
@@ -12,7 +13,7 @@ Usage
 - The validation result will come out
 
 ## Features
-- Handle a list of HKID(s)
+- Validate a list of HKID(s)
 - HKID length and format validation
   - cater for one/two character prefix case
   - whatever Parentheses or not
