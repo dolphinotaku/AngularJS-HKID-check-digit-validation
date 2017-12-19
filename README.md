@@ -9,7 +9,7 @@ I need to perform data migration during my work, to prevent the typing mistakes 
 Let try on the [demo page](http://keithbox.github.io/AngularJS-HKID-check-digit-validation/hkid-check.html)
 
 Usage
-- Paste the HKID to the textarea
+- Paste the HKID to the textarea, concatenate with enter
 - The validation result will come out
 
 ## Features
@@ -25,7 +25,7 @@ Usage
 	- provide a search function, quickly focus on valid/invalid case
 
 ## Requirement
-- angularJS (must)
+- angularJS 1.3.0+ (must)
 - bootstrap (optional)
 
 ## Download
