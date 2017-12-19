@@ -6,189 +6,39 @@
 <script type="text/javascript" src="third-party/jquery-2.1.1.min.js"></script>
 <script type="text/javascript" src="third-party/angular.min.js"></script>
 <script type="text/javascript" src="third-party/bootstrap-3.3.0/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="hkid.checker.js"></script>
 <script>
-var app = angular.module("myApp", [], function() {});
-
-app.controller('HKIDController', function($scope, $rootScope, $filter, $log) {
-	$scope.hkid_source = "";
-	$scope.resultSet = [];
-	$scope.resultCount = {};
-	$scope.duplicatedHKID = [];
+app.controller('HKIDController', ['$scope', function ($scope, $rootScope) {
+	$scope.directiveScopeDict = {};
+	$scope.directiveCtrlDict = {};
 	
-	$scope.HKIDChange = function(){
-		$scope.resultSet = [];
-		$scope.duplicatedHKID = [];
-		$scope.resultCount = {};
-		$scope.resultCount.pass = 0;
-		$scope.resultCount.fail = 0;
-		$scope.resultCount.fail_in_format = 0
-		$scope.resultCount.fail_in_validation = 0;
-		
-		// convert to uppercase
-		var text = angular.copy($scope.hkid_source).toString().toUpperCase();
-		
-		// trim space at start and end
-		text = text.trim();
-		
-		// remove the () sign
-		text = text.replace(/\(|\)/g, "");
-		text = text.trim();
-		
-		if(text == ""){
-			$scope.resultSet = [];
-			return;
+	$scope.EventListener = function(scope, iElement, iAttrs, controller){
+		var prgmID = scope.programId;
+		var tagName = iElement[0].tagName;
+		if($scope.directiveScopeDict[tagName] == null || typeof($scope.directiveScopeDict[tagName]) == "undefined"){
+		  $scope.directiveScopeDict[tagName] = scope;
+		  $scope.directiveCtrlDict[tagName] = controller;
 		}
 		
-		var hkid_list = text.split("\n");
-		
-		// HKID validation
-		for(i=0; i<hkid_list.length; i++){
-			$scope.resultSet[i] = {hkid:'', digit:'', formula:'', pass:''};
-			$scope.resultSet[i]['hkid'] = hkid_list[i].substr(0, hkid_list[i].length-1);
-			$scope.resultSet[i]['digit']= hkid_list[i].slice(-1);//substr(hkid_list[i].length-1, 1);
-			$scope.resultSet[i]['formula'] = "";
-			$scope.resultSet[i]['pass'] = {};
+		//http://api.jquery.com/Types/#Event
+		//The standard events in the Document Object Model are:
+		// blur, focus, load, resize, scroll, unload, beforeunload,
+		// click, dblclick, mousedown, mouseup, mousemove, mouseover, mouseout, mouseenter, mouseleave,
+		// change, select, submit, keydown, keypress, and keyup.
+		iElement.ready(function() {
 			
-			//$scope.resultSet[i]['pass']['status'] = true;
-			//$scope.resultSet[i]['pass']['message'] = "OK";
-			$scope.resultSet[i]['pass'] = $scope.IsHKID(hkid_list[i]);
-			
-			$scope.resultSet[i]['formula'] = $scope.resultSet[i]['pass'].formula;
-		}
-		
-		// HKID duplication check
-		// if don't use slice to copy array, the hkid_list also will sorted
-		var sort_hkid_list = hkid_list.slice(0);
-		sort_hkid_list.sort();
-		
-		var duplicatedHKID = [];
-			var found = 0
-		for(i=0; i<sort_hkid_list.length-1; i++){
-			if(sort_hkid_list[i] == sort_hkid_list[i+1])
-				duplicatedHKID.push(sort_hkid_list[i]);
-		}
-		//$log.log(duplicatedHKID)
-		$scope.duplicatedHKID = duplicatedHKID;
-		// mark it fail if duplicated
-		for(index in duplicatedHKID){
-			var key = duplicatedHKID[index]
-			for(i=0; i<hkid_list.length; i++){
-				if(hkid_list[i] == key){
-					$scope.resultSet[i]['pass']['status'] = false;
-					$scope.resultSet[i]['pass']['message'] = "Invalid, duplicated";
-				}
-			}
-			}
-		
-		for(i=0;i<hkid_list.length; i++){
-			if($scope.resultSet[i].pass.status){
-				$scope.resultCount.pass += 1;
-			}else{
-				$scope.resultCount.fail += 1;
-			}
-		}
+		})
 	}
-	
-	$scope.IsHKID = function(str) {
-		var pass = {};
-		pass.status = false;
-		pass.message = "OK!!";
-		pass.formula = ""
-		
-		// basic check length
-		if (str.length < 8){
-			pass.message = 'Invalid length, it should >=8'
-			$scope.resultCount.fail_in_format+=1
-			return pass;
-		}
-		
-		// handling bracket
-		//if (str.charAt(str.length-3) == '(' && str.charAt(str.length-1) == ')')
-		//	str = str.substring(0, str.length - 3) + str.charAt(str.length -2);
-		
-		// convert to upper case
-		//str = str.toUpperCase();
-		
-		// regular expression to check pattern and split
-		var hkidPat = /^([A-Z]{1,2})([0-9]{6})([A0-9])$/;
-		var matchArray = str.match(hkidPat);
-		
-		//$log.log("HKID: "+str+", match{}:"+matchArray)
-		// not match, return false
-		if (matchArray == null){
-			pass.message = 'Invalid, fail in regular expression check'
-			$scope.resultCount.fail_in_format+=1
-			return pass;
-		}
-		
-		/*
-		var patt = new RegExp(/^[a-zA-Z]{1,2}\d{6}[0-9A]$/);
-		if(str.match(patt))
-			return 'fail in regular expression check';
-		*/
-		
-		// the character part, numeric part and check digit part
-		var charPart = matchArray[1];
-		var numPart = matchArray[2];
-		var checkDigit = matchArray[3];
-		
-		// calculate the checksum for character part
-		var checkSum = 0;
-		if (charPart.length == 2) {
-			checkSum += 9 * (10 + charPart.charAt(0).charCodeAt(0)-65);
-			checkSum += 8 * (10 + charPart.charAt(1).charCodeAt(0)-65);
-			
-			pass.formula += charPart.charAt(0).charCodeAt(0)-64 + 
-				"*9 + " + 
-				charPart.charAt(1).charCodeAt(0)-64 + 
-				"*8 + ";
-		} else {
-			checkSum += 9 * 36;
-			//$log.log("char: "+charPart+", ASCII: "+charPart.charCodeAt(0))
-			checkSum += 8 * (10 + charPart.charCodeAt(0)-65);
-			pass.formula += charPart.charAt(0).charCodeAt(0)-64+"*8 + ";
-		}
-		
-		// calculate the checksum for numeric part
-		for (var i = 0, j = 7; i < numPart.length; i++, j--){
-			checkSum += j * numPart.charAt(i);
-			if(i==numPart.length-1)
-				pass.formula += numPart.charAt(i) + "*" + j;
-			else
-				pass.formula += numPart.charAt(i) + "*" + j + " + ";
-		}
-		
-		// verify the check digit
-		var remaining = checkSum % 11;
-		var verify = remaining == 0 ? 0 : 11 - remaining;
-		
-		pass.formula += "\n = "+checkSum+" % 11 = "+remaining;
-		if(remaining==0)
-			pass.formula += "\n Check Digit should = 0";
-		else
-			pass.formula += "\n Check Digit should = 11 - "+remaining+" = "+verify;
-		
-		if( verify == checkDigit || (verify == 10 && checkDigit == 'A') ){
-			//return "Pass"
-			pass.status = true;
-		}else{
-			pass.message = "Invalid, fail in algorithm validation"
-			$scope.resultCount.fail_in_validation +=1;
-		}
-		
-		//if(pass.status)
-		return pass;
-	}
-});
+}]);
 </script>
 </head>
 <body ng-app="myApp">
-<div style="max-width: 1080px;">
-<form class="form-horizontal" role="form" action="test.php" method="post" ng-controller="HKIDController" style="margin-left: 20px; margin-top: 20px;">
+<div ng-controller="HKIDController as hkidCtrl" class="form-horizontal" style="max-width: 1080px; margin-left: 20px; margin-top: 20px;">
+<hkid ng-model="hkidData">
   <div class="form-group">
     <label for="inputEmail3" class="col-sm-2 control-label">HKID</label>
     <div class="col-sm-4">
-      <textarea class="form-control" ng-model="hkid_source" ng-change="HKIDChange()" rows="5" cols="20"></textarea>
+      <textarea class="form-control" ng-model="hkidData.recordList" rows="5" cols="20" placeholder="place your hkid here, brackets are not necessary"></textarea>
     </div>
     <label class="col-sm-2 control-label">Sample data
 	  <p class="form-control-static">
@@ -197,22 +47,13 @@ A891353(9)
 E585468(0)</pre>
 	  </p>
 	</label>
-	<div class="col-sm-4">
-	Author: Keith Poon<br>
-	Date: 2014-12-05<br>
-	Reference: <a href="http://hknothingblog.blogspot.hk/2013/01/javascript-to-validate-hkid-number.html">Javascript to validate HKID number</a><br>Usage<br>
-	  <ol>
-		<li>Paste the HKID to the textarea</li>
-		<li>The validation result will come out</li>
-	  </ol>
-	P.S age: 4 hours, 20151205-15:52 written by Keith
-	</div>
   </div>
+  <div class="clearfix"></div>
   <div class="form-group">
     <label class="col-sm-2 control-label">Pass</label>
     <div class="col-sm-10">
       <p class="form-control-static">
-	  {{resultCount.pass}} / {{resultSet.length}}
+	  {{hkidData.resultCount.pass}} / {{hkidData.resultSet.length}}
 	  </p>
     </div>
   </div>
@@ -220,24 +61,26 @@ E585468(0)</pre>
     <label class="col-sm-2 control-label">Invalid</label>
     <div class="col-sm-10">
       <p class="form-control-static">
-	  {{resultCount.fail}} / {{resultSet.length}}
+	  {{hkidData.resultCount.fail}} / {{hkidData.resultSet.length}}
 	  </p>
     </div>
   </div>
   <div class="form-group">
-    <label class="col-sm-2 col-sm-offset-2 control-label">length or format</label>
+    <div class="col-sm-3"><label class="col-sm-12 control-label">Invalid type: </label></div>
+    <label class="col-sm-2 control-label">length or format</label>
     <div class="col-sm-1">
-      <p class="form-control-static">{{resultCount.fail_in_format}}</p>
+      <p class="form-control-static">{{hkidData.resultCount.fail_in_format}}</p>
     </div>
     <label class="col-sm-2 control-label">fail in validation</label>
     <div class="col-sm-1">
-      <p class="form-control-static">{{resultCount.fail_in_validation}}</p>
+      <p class="form-control-static">{{hkidData.resultCount.fail_in_validation}}</p>
     </div>
-    <label class="col-sm-2 control-label">Duplicated HKID ({{duplicatedHKID.length}})</label>
+    <label class="col-sm-2 control-label">Duplicated HKID {{hkidData.duplicatedHKID.length}}</label>
     <div class="col-sm-1">
-      <p class="form-control-static">{{duplicatedHKID}}</p>
+      <p class="form-control-static">{{hkidData.duplicatedHKID}}</p>
     </div>
   </div>
+  <div class="clearfix"></div>
   <div class="form-group has-feedback">
 	<div class="col-sm-6 col-sm-offset-2">
 	  <input type="text" name="searchInCreate" class="input-sm form-control" ng-model="searchInCreate">
@@ -253,7 +96,6 @@ E585468(0)</pre>
 	  </select>
 	</div>
   </div>
-  <!--<div class="form-group">-->
     <table class="table table-striped table-hover">
 	  <thead>
 	    <tr>
@@ -264,7 +106,7 @@ E585468(0)</pre>
 		</tr>
 	  </thead>
 	  <tbody>
-	    <tr ng-repeat="row in resultSet | filter:searchInCreate" ng-class="{success:row.pass.status, warning:!row.pass.status}">
+	    <tr ng-repeat="row in hkidData.resultSet | filter:searchInCreate" ng-class="{success:row.pass.status, warning:!row.pass.status}">
 		  <td>{{row.hkid}}</td>
 		  <td>{{row.digit}}</td>
 		  <td><pre>{{row.formula}}</pre></td>
@@ -274,7 +116,21 @@ E585468(0)</pre>
 		</tr>
 	  </tbody>
 	</table>
-  <!--</div>-->
-</form>
+</hkid>
+</div>
+
+<div class="form-group">
+	<div class="col-sm-12">
+	Author: Keith Poon<br>
+	Date: 2014-12-05<br>
+	Reference: <a href="http://hknothingblog.blogspot.hk/2013/01/javascript-to-validate-hkid-number.html">Javascript to validate HKID number</a><br>Usage<br>
+	  <ol>
+		<li>Paste the HKID to the textarea</li>
+		<li>The validation result will come out</li>
+	  </ol>
+	Log: <br>
+	Update: rewrite the angular validation into a directive, 20171219, Keith<br>
+	Add: age: 4 hours, 20151205-15:52 written by Keith
+	</div>
 </div>
 </body>
