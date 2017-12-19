@@ -201,15 +201,13 @@ app.directive('hkid', ['$rootScope', function($rootScope, $cookies) {
 		  function(newValue, oldValue) {
 		  	var changedField = "";
 		  	var changedValue;
-
+			
 		    if ( newValue !== oldValue ) {
 		    	for(var colIndex in $ctrl.ngModel){
 	    			changedField = colIndex;
 	    			changedValue = newValue[colIndex];
 					
 					if (angular.equals(newValue[colIndex], oldValue[colIndex])) continue;
-				console.dir(colIndex);
-				console.dir(changedValue);
 					
                     // Convert to Uppercase, if the chagned field is a Key and data type is string
                     // newValue = ConvertKeyFieldToUppercase(newValue, false);

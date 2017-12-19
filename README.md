@@ -25,7 +25,7 @@ Usage
 	- provide a search function, quickly focus on valid/invalid case
 
 ## Requirement
-- angularJS 1.3.0+ (must)
+- angularJS 1.5.0+ (must)
 - bootstrap (optional)
 
 ## Download

@@ -8,10 +8,10 @@
 <script type="text/javascript" src="third-party/bootstrap-3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="hkid.checker.js"></script>
 <script>
-app.controller('HKIDController', ['$scope', function ($scope, $rootScope) {
+app.controller('HKIDController', ['$scope', '$rootScope', function ($scope, $rootScope) {
+	$scope.hkidData = {};
 	$scope.directiveScopeDict = {};
 	$scope.directiveCtrlDict = {};
-	
 	$scope.EventListener = function(scope, iElement, iAttrs, controller){
 		var prgmID = scope.programId;
 		var tagName = iElement[0].tagName;
